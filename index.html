@@ -79,9 +79,10 @@
 
       let difficolta = 'N/A';
       if (roundCombattimento !== 'N/A' && roundSconfitta !== 'N/A') {
-        const diff = roundCombattimento - roundSconfitta;
-        if (diff > 1.5) difficolta = 'Facile';
-        else if (Math.abs(diff) <= 1.5) difficolta = 'Media';
+        const rc = parseFloat(roundCombattimento);
+        const rs = parseFloat(roundSconfitta);
+        if (rc > rs + 1.5) difficolta = 'Facile';
+        else if (Math.abs(rc - rs) <= 1.5) difficolta = 'Media';
         else difficolta = 'Difficile';
       }
 
