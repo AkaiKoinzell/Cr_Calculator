@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Calcolatore Scontro D&D</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input { margin: 5px; width: 80px; }
+    .block { margin-bottom: 20px; }
+    .output { margin-top: 20px; border: 1px solid black; padding: 10px; width: fit-content; }
+  </style>
+</head>
+<body>
+  <h1>Calcolatore Scontro D&D</h1>  <div class="block">
+    <h3>Personaggi</h3>
+    <div id="pg-container"></div>
+    <button onclick="addPGRow()">Add row</button>
+    <button onclick="removePGRow()">Remove Row</button>
+  </div>  <div class="block">
+    <h3>Mostri</h3>
+    <div id="mob-container"></div>
+    <button onclick="addMobRow()">Add row</button>
+    <button onclick="removeMobRow()">Remove Row</button>
+  </div><button onclick="calcola()">CALCOLA</button>
+
+  <div class="output" id="output"></div>  <script>
+    const levelTable = {
+      1: { hp: 12, dmg: 10 }, 2: { hp: 20.5, dmg: 10 }, 3: { hp: 29, dmg: 15 },
+      4: { hp: 37.5, dmg: 15 }, 5: { hp: 46, dmg: 27 }, 6: { hp: 54.5, dmg: 27 },
+      7: { hp: 63, dmg: 30 }, 8: { hp: 71.5, dmg: 30 }, 9: { hp: 89, dmg: 40 },
+      10: { hp: 98.5, dmg: 45 }, 11: { hp: 108, dmg: 55 }, 12: { hp: 117.5, dmg: 70 },
+      13: { hp: 140, dmg: 85 }, 14: { hp: 150.5, dmg: 90 }, 15: { hp: 161, dmg: 100 },
+      16: { hp: 171.5, dmg: 110 }, 17: { hp: 199, dmg: 120 }, 18: { hp: 210.5, dmg: 120 },
+      19: { hp: 222, dmg: 120 }, 20: { hp: 233.5, dmg: 150 }
+    };
+
+    function addPGRow() {
+      const div = document.createElement('div');
+      div.innerHTML = `Numero PG: <input type='number' class='pg-num'> Livello PG: <input type='number' class='pg-lvl'>`;
+      document.getElementById('pg-container').appendChild(div);
+    }
+
+    function removePGRow() {
+      const container = document.getElementById('pg-container');
+      if (container.lastChild) container.removeChild(container.lastChild);
+    }
+
+    function addMobRow() {
+      const div = document.createElement('div');
+      div.innerHTML = `Numero Mostri: <input type='number' class='mob-num'> HP Mostro: <input type='number' class='mob-hp'> Danni Medi: <input type='number' class='mob-dmg'>`;
+      document.getElementById('mob-container').appendChild(div);
+    }
+
+    function removeMobRow() {
+      const container = document.getElementById('mob-container');
+      if (container.lastChild) container.removeChild(container.lastChild);
+    }
+
+    function calcola() {
+      let hpParty = 0, dmgParty = 0, hpNemici = 0, dmgNemici = 0;
+
+      document.querySelectorAll('#pg-container div').forEach(div => {
+        const num = parseInt(div.querySelector('.pg-num').value);
+        const lvl = parseInt(div.querySelector('.pg-lvl').value);
+        if (!levelTable[lvl]) return;
+        hpParty += num * levelTable[lvl].hp;
+        dmgParty += num * levelTable[lvl].dmg;
+      });
+
+      document.querySelectorAll('#mob-container div').forEach(div => {
+        const num = parseInt(div.querySelector('.mob-num').value);
+        const hp = parseFloat(div.querySelector('.mob-hp').value);
+        const dmg = parseFloat(div.querySelector('.mob-dmg').value);
+        hpNemici += num * hp;
+        dmgNemici += num * dmg;
+      });
+
+      let roundCombattimento = (dmgParty > 0) ? (hpNemici / dmgParty).toFixed(2) : 'N/A';
+      let roundSconfitta = (dmgNemici > 0) ? (hpParty / dmgNemici).toFixed(2) : 'N/A';
+
+      let difficolta = 'N/A';
+      if (roundCombattimento !== 'N/A' && roundSconfitta !== 'N/A') {
+        const diff = roundCombattimento - roundSconfitta;
+        if (diff > 1.5) difficolta = 'Facile';
+        else if (Math.abs(diff) <= 1.5) difficolta = 'Media';
+        else difficolta = 'Difficile';
+      }
+
+      document.getElementById('output').innerHTML =
+        `<strong>Turni previsti di combattimento:</strong> ${roundCombattimento}<br>
+         <strong>Difficoltà:</strong> ${difficolta}<br>
+         <em>Ricorda che questo contatore non tiene conto della CA, TPC o di effetti che fanno perdere il turno, ambo i lati (PG e Mostri)</em>`;
+    }
+
+    // Default row
+    addPGRow();
+    addMobRow();
+  </script></body>
+</html>
