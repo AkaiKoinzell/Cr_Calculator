@@ -83,25 +83,24 @@
         dmgNemici += num * dmg;
       });
 
-      let roundCombattimento = (dmgParty > 0) ? (hpNemici / dmgParty) : null;
-      let roundSconfitta = (dmgNemici > 0) ? (hpParty / dmgNemici) : null;
+      let roundCombattimento = (dmgParty > 0) ? Math.round(hpNemici / dmgParty) : null;
+      let roundSconfitta = (dmgNemici > 0) ? Math.round(hpParty / dmgNemici) : null;
 
       let difficolta = 'N/A';
       if (roundCombattimento !== null && roundSconfitta !== null) {
-        if (roundCombattimento > roundSconfitta + 1.5) {
-          difficolta = 'Facile';
-        } else if (Math.abs(roundCombattimento - roundSconfitta) <= 1.5) {
-          difficolta = 'Media';
-        } else if (roundCombattimento < roundSconfitta - 1.5) {
-          difficolta = 'Difficile';
-        }
+        const diff = roundSconfitta - roundCombattimento;
+        if (diff > 5) difficolta = 'Trivial';
+        else if (diff > 1.5) difficolta = 'Facile';
+        else if (Math.abs(diff) <= 1.5) difficolta = 'Media';
+        else if (diff < -5) difficolta = 'Mortale';
+        else difficolta = 'Difficile';
       }
 
       document.getElementById('output').innerHTML =
-        `<strong>Turni previsti di combattimento:</strong> ${roundCombattimento?.toFixed(2) || 'N/A'}<br>
-         <strong>Turni previsti alla sconfitta:</strong> ${roundSconfitta?.toFixed(2) || 'N/A'}<br>
+        `<strong>Round previsti per sconfiggere i mostri:</strong> ${roundCombattimento ?? 'N/A'}<br>
+         <strong>Round previsti alla sconfitta del party:</strong> ${roundSconfitta ?? 'N/A'}<br>
          <strong>Difficoltà:</strong> ${difficolta}<br>
-         <em>Ricorda che questo contatore non tiene conto della CA, TPC o di effetti che fanno perdere il turno, ambo i lati (PG e Mostri)</em>`;
+         <em>Ricorda che questo contatore non tiene conto della CA, TPC, oggetti, o capacità speciali peculiari che fanno perdere il turno, ambo i lati (PG e Mostri)</em>`;
     }
 
     // Default row
